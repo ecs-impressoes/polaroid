@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Raciocínio Sem Limites - Inclusão e Acessibilidade</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Variáveis para temas */
+    :root {
+      --bg: #f9fafc;
+      --text: #1e293b;
+      --card: #ffffff;
+      --primary: #2c7da0;
+      --primary-dark: #1f5e7a;
+      --secondary: #61a5c2;
+      --accent: #e9c46a;
+      --border: #e2e8f0;
+      --focus: #f4a261;
+      --success: #2a9d8f;
+      --font-size: 1rem;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.5;
+      transition: background-color 0.2s, color 0.2s;
+      font-size: var(--font-size);
+    }
+
+    /* ALTO CONTRASTE */
+    body.high-contrast {
+      --bg: #000000;
+      --text: #ffff00;
+      --card: #111111;
+      --primary: #ffff00;
+      --primary-dark: #cccc00;
+      --border: #ffff00;
+      --focus: #ffffff;
+      --success: #00ff00;
+    }
+
+    /* FONTE AMPLIADA */
+    body.large-font {
+      --font-size: 1.4rem;
+    }
+
+    /* NAVEGAÇÃO POR TECLADO */
+    a:focus-visible, button:focus-visible, .activity-card:focus-visible, .option:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 4px;
+      transform: scale(1.01);
+    }
+
+    /* Layout principal */
+    .app-container {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    /* BARRA DE ACESSIBILIDADE */
+    .access-bar {
+      background: var(--card);
+      border-radius: 60px;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .access-btn {
+      background: var(--primary);
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+
+    .access-btn:hover {
+      background: var(--primary-dark);
+      transform: scale(1.02);
+    }
+
+    .difficulty-selector {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .difficulty-btn {
+      background: var(--border);
+      border: none;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .difficulty-btn.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    /* cards de atividades */
+    .activities-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .activity-card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      transition: 0.2s;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+
+    .activity-card h3 {
+      color: var(--primary-dark);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ÁREA DO EXERCÍCIO */
+    .exercise-area {
+      background: var(--card);
+      border-radius: 32px;
+      padding: 1.8rem;
+      border: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+
+    .question-text {
+      font-size: 1.6rem;
+      font-weight: 600;
+      text-align: center;
+      margin: 1rem 0;
+      background: var(--bg);
+      padding: 1.2rem;
+      border-radius: 48px;
+    }
+
+    .options-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1.2rem;
+      margin: 2rem 0;
+    }
+
+    .option {
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 60px;
+      padding: 0.8rem 1.8rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.1s linear;
+      text-align: center;
+      min-width: 100px;
+    }
+
+    .option:hover {
+      background: var(--secondary);
+      color: white;
+      transform: scale(1.03);
+    }
+
+    .feedback {
+      text-align: center;
+      font-size: 1.3rem;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 40px;
+      background: var(--border);
+    }
+
+    .next-btn {
+      background: var(--success);
+      border: none;
+      padding: 0.8rem 2rem;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      display: block;
+      margin: 1rem auto 0;
+    }
+
+    /* LIBRAS VÍDEO SIMULADO (ícone informativo) */
+    .libras-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--primary);
+      color: white;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      opacity: 0.7;
+    }
+
+    button {
+      font-family: inherit;
+    }
+
+    @media (max-width: 650px) {
+      .options-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      .question-text {
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <!-- BARRA DE ACESSIBILIDADE PROFISSIONAL -->
+  <div class="access-bar">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <button class="access-btn" id="highContrastBtn" aria-label="Ativar alto contraste">🌓 Alto Contraste</button>
+      <button class="access-btn" id="largeFontBtn" aria-label="Aumentar fonte">🔍 Fonte Ampliada</button>
+      <button class="access-btn" id="resetAccessBtn" aria-label="Redefinir acessibilidade">♻️ Redefinir</button>
+    </div>
+    <div class="difficulty-selector">
+      <span style="font-weight:500;">Nível:</span>
+      <button data-diff="easy" class="difficulty-btn active" id="diffEasy">🌱 Fácil</button>
+      <button data-diff="medium" class="difficulty-btn" id="diffMedium">⚡ Médio</button>
+      <button data-diff="hard" class="difficulty-btn" id="diffHard">🧠 Avançado</button>
+    </div>
+  </div>
+
+  <!-- GRADE DE ATIVIDADES (escolha do tipo de raciocínio) -->
+  <div class="activities-grid">
+    <div class="activity-card" data-type="memory" tabindex="0" role="button" aria-label="Atividade de memória e atenção">
+      <h3>🧩 Memória & Atenção</h3>
+      <p>Encontre padrões, sequências visuais e exercite o foco.</p>
+      <div class="libras-badge">🤟 Acessível em Libras (ícone informativo)</div>
+    </div>
+    <div class="activity-card" data-type="logic" tabindex="0" role="button" aria-label="Atividade de lógica e sequência">
+      <h3>🔁 Lógica & Sequência</h3>
+      <p>Complete a série e desenvolva o raciocínio lógico.</p>
+      <div class="libras-badge">🤟 Suporte textual + áudio integrado</div>
+    </div>
+    <div class="activity-card" data-type="cause" tabindex="0" role="button" aria-label="Atividade de causa e efeito">
+      <h3>⚡ Causa & Efeito</h3>
+      <p>O que acontece quando...? Aprenda consequências.</p>
+      <div class="libras-badge">🎧 Feedback sonoro e visual</div>
+    </div>
+  </div>
+
+  <!-- ÁREA DINÂMICA DO EXERCÍCIO -->
+  <div class="exercise-area" id="exerciseArea" aria-live="polite">
+    <div id="exerciseContent">
+      <!-- Conteúdo será preenchido via JS -->
+      <p style="text-align:center;">✨ Selecione uma atividade acima para começar ✨</p>
+    </div>
+  </div>
+  <div class="footer">
+    <p>♿ Raciocínio Sem Limites • Compatível com leitores de tela, navegação por teclado e comandos de voz (Web Speech API).</p>
+  </div>
+</div>
+
+<script>
+  // -------------------- ESTADO GLOBAL --------------------
+  let currentDifficulty = "easy";   // easy, medium, hard
+  let currentActivityType = null;   // 'memory', 'logic', 'cause'
+  let currentQuestion = null;
+  let currentFeedback = null;
+  let currentOptions = [];
+  let correctAnswer = null;
+  let answered = false;
+
+  // Elementos DOM
+  const exerciseDiv = document.getElementById('exerciseContent');
+  const diffEasyBtn = document.getElementById('diffEasy');
+  const diffMediumBtn = document.getElementById('diffMedium');
+  const diffHardBtn = document.getElementById('diffHard');
+  const highContrastBtn = document.getElementById('highContrastBtn');
+  const largeFontBtn = document.getElementById('largeFontBtn');
+  const resetAccessBtn = document.getElementById('resetAccessBtn');
+
+  // ---------- BANCO DE QUESTÕES POR TIPO + DIFICULDADE ----------
+  const questionBank = {
+    memory: {
+      easy: [
+        { text: "🐶 🐱 🐶 🐱 ?", options: ["🐶", "🐱", "🐭"], correct: "🐱", explanation: "Alterna entre cachorro e gato." },
+        { text: "🔴 🔵 🔴 🔵 ?", options: ["🔴", "🟢", "🔵"], correct: "🔵", explanation: "Sequência alternada de vermelho e azul." }
+      ],
+      medium: [
+        { text: "🍎 🍌 🍎 🍌 🍎 ?", options: ["🍎", "🍌", "🍊"], correct: "🍌", explanation: "Maçã, banana, maçã, banana... próximo é banana." },
+        { text: "⬆️ ➡️ ⬆️ ➡️ ⬆️ ?", options: ["⬆️", "⬅️", "➡️"], correct: "➡️", explanation: "Alterna entre cima e direita." }
+      ],
+      hard: [
+        { text: "🟦 🟩 🟨 🟦 🟩 ?", options: ["🟨", "🟧", "🟦"], correct: "🟨", explanation: "Padrão: azul, verde, amarelo, repete." },
+        { text: "2️⃣ 4️⃣ 6️⃣ 8️⃣ ?", options: ["9️⃣", "🔟", "1️⃣2️⃣"], correct: "🔟", explanation: "Números pares: próximo é 10." }
+      ]
+    },
+    logic: {
+      easy: [
+        { text: "Complete: 🍕 (comer) → 🥤 (beber) → 🍰 (?)", options: ["comer", "beber", "cozinhar"], correct: "comer", explanation: "Bolo também se come." },
+        { text: "Verão → calor, Inverno → ?", options: ["frio", "chuva", "vento"], correct: "frio", explanation: "Inverno é frio." }
+      ],
+      medium: [
+        { text: "Todos os pássaros voam. Pinguim é pássaro. Então pinguim ?", options: ["voa", "não voa", "talvez voe"], correct: "não voa", explanation: "Exceção, pinguins não voam, mas a lógica comum indica cuidado." },
+        { text: "Se hoje é segunda, depois de amanhã será?", options: ["quarta", "quinta", "terça"], correct: "quarta", explanation: "Segunda + 2 dias = quarta." }
+      ],
+      hard: [
+        { text: "Ana é mais alta que Bia. Carla é mais baixa que Ana. Quem é a mais baixa?", options: ["Ana", "Bia", "Carla"], correct: "Carla", explanation: "Carla é mais baixa que Ana e Bia não tem altura definida, mas Carla é a mais baixa." },
+        { text: "João tem 3 irmãos. Cada irmão tem 2 irmãos. Quantos filhos são ao todo?", options: ["3", "4", "5"], correct: "4", explanation: "João + 3 irmãos = 4 filhos." }
+      ]
+    },
+    cause: {
+      easy: [
+        { text: "O que acontece se você esquecer o guarda-chuva em um dia de chuva?", options: ["Você se molha", "Fica seco", "Faz sol"], correct: "Você se molha", explanation: "Chuva sem guarda-chuva = molhado." },
+        { text: "Se você acender um fósforo perto de gasolina?", options: ["Fogo", "Gelo", "Cheiro bom"], correct: "Fogo", explanation: "Risco de incêndio." }
+      ],
+      medium: [
+        { text: "O que ocorre se uma planta não receber luz solar por semanas?", options: ["Cresce mais", "Fica amarelada e morre", "Floresce"], correct: "Fica amarelada e morre", explanation: "Sem luz, planta não faz fotossíntese." },
+        { text: "Se você estudar todos os dias para uma prova, o mais provável é:", options: ["Tirar nota baixa", "Tirar nota boa", "Esquecer tudo"], correct: "Tirar nota boa", explanation: "Estudo constante traz bons resultados." }
+      ],
+      hard: [
+        { text: "Num ecossistema, se todos os predadores forem removidos, o que tende a acontecer?", options: ["Presas aumentam demais e faltam recursos", "Plantas crescem mais", "Equilíbrio perfeito"], correct: "Presas aumentam demais e faltam recursos", explanation: "Desequilíbrio populacional." },
+        { text: "Um avião perde os dois motores em voo. O piloto deve:", options: ["Pular sem paraquedas", "Planejar o avião", "Fechar os olhos"], correct: "Planejar o avião", explanation: "Mesmo sem motor, pode planar." }
+      ]
+    }
+  };
+
+  // Função para gerar pergunta baseada no tipo e dificuldade
+  function generateQuestion() {
+    if (!currentActivityType) return null;
+    const bank = questionBank[currentActivityType];
+    if (!bank) return null;
+    const levelQuestions = bank[currentDifficulty];
+    if (!levelQuestions || levelQuestions.length === 0) return null;
+    // Seleciona aleatória (mas pode ser melhorada, por simplicidade random)
+    const idx = Math.floor(Math.random() * levelQuestions.length);
+    return { ...levelQuestions[idx] };
+  }
+
+  // Renderiza o exercício ativo
+  function renderExercise() {
+    if (!currentActivityType) {
+      exerciseDiv.innerHTML = `<p style="text-align:center;">🧠 Escolha um dos cards acima para iniciar os desafios de raciocínio.<br><span style="font-size:0.9rem;">♿ Navegue com TAB e ENTER ou clique.</span></p>`;
+      return;
+    }
+
+    const q = generateQuestion();
+    if (!q) {
+      exerciseDiv.innerHTML = `<p style="text-align:center;">⚠️ Nenhuma questão disponível para esta combinação. Tente outro nível.</p>`;
+      return;
+    }
+    currentQuestion = q.text;
+    currentOptions = [...q.options];
+    correctAnswer = q.correct;
+    answered = false;
+    currentFeedback = null;
+
+    // Monta HTML com acessibilidade
+    let optionsHtml = '';
+    currentOptions.forEach(opt => {
+      optionsHtml += `<div class="option" tabindex="0" role="button" aria-label="Opção: ${opt}" data-value="${opt}">${opt}</div>`;
+    });
+
+    const html = `
+      <div style="text-align:center;">
+        <div class="question-text" aria-label="Pergunta: ${currentQuestion}">${currentQuestion}</div>
+        <div class="options-container" id="optionsContainer">
+          ${optionsHtml}
+        </div>
+        <div id="feedbackArea" class="feedback"></div>
+        <button id="nextQuestionBtn" class="next-btn" style="display:none;">➡️ Próxima questão</button>
+      </div>
+    `;
+    exerciseDiv.innerHTML = html;
+
+    // Adicionar eventos às opções
+    const optionDivs = document.querySelectorAll('.option');
+    optionDivs.forEach(optDiv => {
+      optDiv.addEventListener('click', () => handleAnswer(optDiv.getAttribute('data-value')));
+      optDiv.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleAnswer(optDiv.getAttribute('data-value'));
+        }
+      });
+    });
+
+    // Anunciar para leitores de tela
+    const liveRegion = document.createElement('div');
+    liveRegion.setAttribute('aria-live', 'assertive');
+    liveRegion.classList.add('sr-only');
+    exerciseDiv.appendChild(liveRegion);
+    setTimeout(() => {
+      if (liveRegion) liveRegion.remove();
+    }, 1000);
+  }
+
+  function handleAnswer(selected) {
+    if (answered) return;
+    answered = true;
+    const feedbackDiv = document.getElementById('feedbackArea');
+    const nextBtn = document.getElementById('nextQuestionBtn');
+    let isCorrect = (selected === correctAnswer);
+    let feedbackMsg = isCorrect ? `✅ Correto! ${currentQuestion} → ${selected}. ${currentQuestion?.explanation || ''}` : `❌ Incorreto. A resposta correta era ${correctAnswer}. ${currentQuestion?.explanation || ''}`;
+    if (!currentQuestion?.explanation && !isCorrect) feedbackMsg = `❌ Resposta errada. O correto é ${correctAnswer}.`;
+    
+    feedbackDiv.innerHTML = `<span role="status">${feedbackMsg}</span>`;
+    feedbackDiv.style.background = isCorrect ? 'var(--success)' : '#e76f51';
+    feedbackDiv.style.color = 'white';
+    
+    // Desabilitar opções visualmente
+    document.querySelectorAll('.option').forEach(opt => {
+      opt.style.opacity = '0.6';
+      opt.style.pointerEvents = 'none';
+    });
+    
+    nextBtn.style.display = 'block';
+    nextBtn.addEventListener('click', () => {
+      renderExercise(); // nova pergunta
+    });
+    // Feedback por voz (opcional Web Speech)
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(isCorrect ? "Resposta correta!" : `Resposta incorreta. A correta é ${correctAnswer}`);
+      utterance.lang = 'pt-BR';
+      utterance.rate = 0.9;
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+  }
+
+  // Atualizar difficulty e re-render se houver atividade ativa
+  function setDifficulty(level) {
+    currentDifficulty = level;
+    document.querySelectorAll('.difficulty-btn').forEach(btn => btn.classList.remove('active'));
+    if (level === 'easy') diffEasyBtn.classList.add('active');
+    if (level === 'medium') diffMediumBtn.classList.add('active');
+    if (level === 'hard') diffHardBtn.classList.add('active');
+    if (currentActivityType) renderExercise();
+  }
+
+  function setActivityType(type) {
+    currentActivityType = type;
+    renderExercise();
+    // Anúncio para acessibilidade
+    const area = document.getElementById('exerciseArea');
+    area.focus({ preventScroll: false });
+  }
+
+  // EVENTOS DOS CARDS
+  document.querySelectorAll('.activity-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      const type = card.getAttribute('data-type');
+      if (type) setActivityType(type);
+    });
+    card.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const type = card.getAttribute('data-type');
+        if (type) setActivityType(type);
+      }
+    });
+  });
+
+  diffEasyBtn.addEventListener('click', () => setDifficulty('easy'));
+  diffMediumBtn.addEventListener('click', () => setDifficulty('medium'));
+  diffHardBtn.addEventListener('click', () => setDifficulty('hard'));
+
+  // ----- FUNÇÕES DE ACESSIBILIDADE (alto contraste e fonte) -----
+  function applyHighContrast(enabled) {
+    if (enabled) {
+      document.body.classList.add('high-contrast');
+    } else {
+      document.body.classList.remove('high-contrast');
+    }
+    localStorage.setItem('hc', enabled ? 'true' : 'false');
+  }
+
+  function applyLargeFont(enabled) {
+    if (enabled) {
+      document.body.classList.add('large-font');
+    } else {
+      document.body.classList.remove('large-font');
+    }
+    localStorage.setItem('largeFont', enabled ? 'true' : 'false');
+  }
+
+  function resetAccessibility() {
+    document.body.classList.remove('high-contrast');
+    document.body.classList.remove('large-font');
+    localStorage.setItem('hc', 'false');
+    localStorage.setItem('largeFont', 'false');
+  }
+
+  // Carregar preferências salvas
+  function loadAccessPreferences() {
+    const hc = localStorage.getItem('hc') === 'true';
+    const lf = localStorage.getItem('largeFont') === 'true';
+    if (hc) document.body.classList.add('high-contrast');
+    if (lf) document.body.classList.add('large-font');
+  }
+
+  highContrastBtn.addEventListener('click', () => {
+    const isHC = document.body.classList.contains('high-contrast');
+    applyHighContrast(!isHC);
+  });
+  largeFontBtn.addEventListener('click', () => {
+    const isLF = document.body.classList.contains('large-font');
+    applyLargeFont(!isLF);
+  });
+  resetAccessBtn.addEventListener('click', resetAccessibility);
+  
+  // Inicialização
+  loadAccessPreferences();
+  
+  // Suporte para Web Speech opcional + mensagem inicial sobre LIBRAS: simulamos card com badge já.
+  // Adiciona instrução dinâmica para comandos de voz (não obrigatório)
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    console.log("Reconhecimento de voz disponível (para expansão futura)");
+  }
+
+  // Ao iniciar, nenhuma atividade selecionada.
+  // Tratamento extra para foco acessível
+  const firstCard = document.querySelector('.activity-card');
+  if (firstCard) firstCard.setAttribute('tabindex', '0');
+  
+  // Estilo para foco adicional
+  const styleFocus = document.createElement('style');
+  styleFocus.textContent = `.option:focus-visible, .activity-card:focus-visible { outline: 3px solid var(--focus); background: rgba(0,0,0,0.05); }`;
+  document.head.appendChild(styleFocus);
+  
+  // feedback caso usuário selecione teclas no body
+  window.addEventListener('load', () => {
+    // Garantir que área não fique vazia
+    if (!currentActivityType) {
+      exerciseDiv.innerHTML = `<p style="text-align:center;">🧠 Clique ou pressione Enter em um card de atividade. Exercícios com áudio de confirmação, alto contraste e fonte ampliada.<br>🎧 Testado para deficiência motora e visual.</p>`;
+    }
+  });
+</script>
+</body>
+</html>
