@@ -1,4 +1,4 @@
-Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 fotos por folha A4, espaçamento de 4 mm entre molduras, borda superior igual às laterais, e campo para escrever uma legenda na área branca inferior de cada Polaroid.
+Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área reservada para a frase na borda inferior, e adicionei marcas de recorte (crop marks) nos cantos de cada foto para facilitar o corte após a impressão. O grid permanece 3×3 com espaçamento de 4 mm.
 
 ```html
 <!DOCTYPE html>
@@ -6,7 +6,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Polaroid Pro Studio | Montagem A4 3x3 com legenda</title>
+    <title>Polaroid Pro Studio | Cortes e Frases</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -82,7 +82,6 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
             to { opacity: 1; transform: translateY(0);}
         }
 
-        /* Multi A4 area */
         .multi-upload-area {
             background: #181824;
             border-radius: 32px;
@@ -240,14 +239,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
             font-size: 0.7rem;
             color: #5a5a70;
         }
-        
-        .warning-limit {
-            color: #ffaa66;
-            font-size: 0.75rem;
-            margin-top: 8px;
-        }
-        
-        /* Estilo do campo legenda */
+
         .caption-group {
             margin-top: 15px;
             background: #101018;
@@ -259,24 +251,21 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
             display: block;
             margin-bottom: 8px;
         }
-        .caption-group input {
-            margin-top: 0;
-        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-camera-retro"></i> Polaroid Pro Studio</h1>
-        <p>alta resolução 300 DPI • moldura autêntica • legenda na borda inferior</p>
+        <p>com marcas de recorte • legenda na borda inferior • grid 3x3 • espaçamento 4mm</p>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="single"><i class="fas fa-image"></i> Polaroid Único</button>
-        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (3x3 fotos)</button>
+        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (3x3 com recorte)</button>
     </div>
 
-    <!-- ABA 1: SINGLE (mantido para fotos individuais) -->
+    <!-- ABA 1: SINGLE (individual com ajustes) -->
     <div id="singleTab" class="tab-content active">
         <div class="studio-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 25px;">
             <div class="preview-area" style="background:#0f0f17; border-radius:32px; padding:20px;">
@@ -320,7 +309,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         </div>
     </div>
 
-    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 com grid 3x3 e legenda -->
+    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 com grid 3x3, marcas de recorte e legenda -->
     <div id="multiTab" class="tab-content">
         <div class="multi-upload-area">
             <div class="dropzone-multi" id="multiDropzone">
@@ -342,20 +331,15 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
                 <div class="config-item">
                     <label><i class="fas fa-arrows-alt"></i> Margem A4 (mm)</label>
                     <input type="number" id="marginMM" value="12" step="1" min="5" max="30">
-                    <small>distância das bordas da folha</small>
-                </div>
-                <div class="config-item">
-                    <label><i class="fas fa-comment"></i> Legenda (frase abaixo da foto)</label>
-                    <input type="text" id="captionText" placeholder="Ex: Dia especial ❤️" value="">
                 </div>
             </div>
             <div class="caption-group">
-                <label><i class="fas fa-pen-fancy"></i> Personalize a legenda para cada foto? (se vazio, usa frase genérica)</label>
-                <input type="text" id="globalCaption" placeholder="Frase que aparecerá em todas as fotos (opcional)" value="momentos polaroid">
-                <small style="display:block; margin-top:5px;">A legenda será centralizada na área branca inferior da moldura</small>
+                <label><i class="fas fa-pen-fancy"></i> Frase na área branca inferior (todas as fotos)</label>
+                <input type="text" id="globalCaption" placeholder="Ex: Meu momento especial" value="momento polaroid">
+                <small style="display:block; margin-top:5px;">A frase será centralizada na borda inferior de cada Polaroid</small>
             </div>
             <div style="margin-top: 15px;">
-                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (3x3 - espaçamento 4mm)</button>
+                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (com marcas de recorte)</button>
             </div>
         </div>
         <div class="preview-a4">
@@ -363,12 +347,12 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
                 <canvas id="a4Canvas" width="2480" height="3508" style="width:100%; height:auto; max-width:100%; background:white;"></canvas>
             </div>
             <div class="info-badge">
-                <i class="fas fa-ruler-combined"></i> A4 @300 DPI (2480x3508px) • layout fixo 3 colunas × 3 linhas • espaçamento 4mm entre molduras • legenda na parte inferior
+                <i class="fas fa-ruler-combined"></i> A4 @300 DPI (2480x3508px) • grid 3x3 • espaçamento 4mm • marcas de corte nos cantos de cada foto
             </div>
             <button id="downloadA4Btn" class="btn btn-primary" style="margin-top:20px;"><i class="fas fa-file-image"></i> Baixar A4 (PNG 300DPI)</button>
         </div>
     </div>
-    <footer>ECS Impressões • Sistema profissional • topo da foto com mesma borda lateral • legenda automática</footer>
+    <footer>ECS Impressões • Área inferior reservada para frase • Marcas de recorte para acabamento profissional</footer>
 </div>
 
 <script>
@@ -376,27 +360,22 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
     // CONSTANTES GLOBAIS
     const DPI = 300;
     const CM_TO_PX = (cm) => (cm / 2.54) * DPI;
-    const A4_CM = { w: 21.0, h: 29.7 };
     const A4_PX = { w: Math.round(CM_TO_PX(21.0)), h: Math.round(CM_TO_PX(29.7)) }; // 2480x3508
     
-    // Especificações dos tipos Polaroid (medidas em cm)
     const POLA_SPECS = {
         classic: { totalCM: { w: 8.8, h: 10.8 }, photoCM: { w: 7.9, h: 7.7 }, isRound: false, roundDiameterCM: null },
         go: { totalCM: { w: 5.39, h: 6.66 }, photoCM: { w: 4.7, h: 4.6 }, isRound: false, roundDiameterCM: null },
         round: { totalCM: { w: 8.8, h: 10.8 }, photoCM: { w: 7.68, h: 7.68 }, isRound: true, roundDiameterCM: 7.68 }
     };
     
-    // Helper: desenha uma moldura Polaroid completa com legenda (na borda inferior)
-    // ctx, imgSource, typeKey, x, y, width, height (retângulo alvo da moldura), caption (string)
+    // Função principal: desenha moldura + foto + legenda na área inferior
     function drawPolaroidWithCaption(ctx, imgSource, typeKey, x, y, targetWidth, targetHeight, caption) {
         const spec = POLA_SPECS[typeKey];
-        // 1. Desenhar fundo branco da moldura
+        // 1. Fundo branco da moldura
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(x, y, targetWidth, targetHeight);
         
-        // 2. Calcular a área interna da foto dentro da moldura (proporcional)
-        // A proporção da moldura é fixa (totalCM.w / totalCM.h). Como o retângulo alvo pode ter proporção diferente,
-        // centralizamos a moldura mantendo a proporção original.
+        // 2. Centralizar a moldura mantendo proporção original (pois célula pode ter aspecto diferente)
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
         let drawTotalW, drawTotalH;
         if (polaroidAspect > (targetWidth / targetHeight)) {
@@ -409,17 +388,16 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         const offsetX = x + (targetWidth - drawTotalW) / 2;
         const offsetY = y + (targetHeight - drawTotalH) / 2;
         
-        // 3. Dentro da moldura centralizada, calcular posição da foto (com bordas laterais iguais e topo igual lateral)
-        const lateralCM = (spec.totalCM.w - spec.photoCM.w) / 2;
-        const lateralRatio = lateralCM / spec.totalCM.w;
+        // 3. Calcular área da foto (com bordas laterais iguais e topo igual às laterais)
+        const lateralRatio = (spec.totalCM.w - spec.photoCM.w) / (2 * spec.totalCM.w);
         const lateralPx = drawTotalW * lateralRatio;
-        const topPx = lateralPx;  // topo igual às laterais (conforme solicitado)
+        const topPx = lateralPx;  // borda superior igual à lateral (corrigido)
         const photoWidthPx = drawTotalW * (spec.photoCM.w / spec.totalCM.w);
         const photoHeightPx = drawTotalH * (spec.photoCM.h / spec.totalCM.h);
         const photoX = offsetX + lateralPx;
         const photoY = offsetY + topPx;
         
-        // 4. Desenhar a imagem dentro da área da foto (contain, sem cortes)
+        // 4. Desenhar imagem (contain, sem recortes)
         ctx.save();
         if (spec.isRound && spec.roundDiameterCM) {
             const centerX = photoX + photoWidthPx/2;
@@ -448,7 +426,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         ctx.drawImage(imgSource, 0, 0, imgW, imgH, drawImgX, drawImgY, drawImgW, drawImgH);
         ctx.restore();
         
-        // 5. Se round, borda sutil
+        // 5. Se round, adiciona borda sutil
         if (spec.isRound && spec.roundDiameterCM) {
             ctx.save();
             const centerX = photoX + photoWidthPx/2;
@@ -456,33 +434,73 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
             const radius = Math.min(photoWidthPx, photoHeightPx)/2;
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
-            ctx.strokeStyle = "#DDDDDD";
-            ctx.lineWidth = 1.5;
+            ctx.strokeStyle = "#CCCCCC";
+            ctx.lineWidth = 1.2;
             ctx.stroke();
             ctx.restore();
         }
         
-        // 6. Desenhar legenda na área branca inferior (entre o fim da foto e a borda inferior da moldura)
+        // 6. Escrever a legenda na área branca inferior (entre a foto e a borda inferior da moldura)
         if (caption && caption.trim() !== "") {
-            const bottomAreaY = photoY + photoHeightPx;
-            const bottomAreaHeight = (offsetY + drawTotalH) - bottomAreaY;
-            if (bottomAreaHeight > 10) {
-                ctx.font = `400 ${Math.max(10, Math.min(16, bottomAreaHeight * 0.25))}px 'Segoe UI', 'Inter'`;
+            const bottomAreaTop = photoY + photoHeightPx;
+            const bottomAreaHeight = (offsetY + drawTotalH) - bottomAreaTop;
+            if (bottomAreaHeight > 8) {
+                let fontSize = Math.max(10, Math.min(18, bottomAreaHeight * 0.28));
+                ctx.font = `500 ${fontSize}px 'Segoe UI', 'Inter'`;
                 ctx.fillStyle = "#2c2c2c";
                 ctx.textAlign = "center";
                 ctx.textBaseline = "middle";
                 const centerTextX = offsetX + drawTotalW/2;
-                const textY = bottomAreaY + bottomAreaHeight/2;
+                const textY = bottomAreaTop + bottomAreaHeight/2;
                 ctx.fillText(caption, centerTextX, textY);
+                ctx.textAlign = "left";
             } else {
-                // fallback pequeno
                 ctx.font = `10px 'Segoe UI'`;
                 ctx.fillStyle = "#333";
                 ctx.textAlign = "center";
-                ctx.fillText(caption, offsetX + drawTotalW/2, bottomAreaY + bottomAreaHeight/2);
+                ctx.fillText(caption, offsetX + drawTotalW/2, bottomAreaTop + bottomAreaHeight/2);
+                ctx.textAlign = "left";
             }
-            ctx.textAlign = "left"; // reset
         }
+        
+        // Retornamos as coordenadas da moldura total (offsetX, offsetY, drawTotalW, drawTotalH) para marcas de recorte
+        return { molduraX: offsetX, molduraY: offsetY, molduraW: drawTotalW, molduraH: drawTotalH };
+    }
+    
+    // Função para desenhar marcas de recorte (crop marks) nos cantos de cada foto
+    function drawCropMarks(ctx, molduraX, molduraY, molduraW, molduraH, markLength = 8) {
+        ctx.save();
+        ctx.strokeStyle = "#FF0000";  // vermelho para visibilidade (na impressão fica como referência)
+        ctx.lineWidth = 1.2;
+        // Canto superior esquerdo
+        ctx.beginPath();
+        ctx.moveTo(molduraX - 2, molduraY);
+        ctx.lineTo(molduraX + markLength, molduraY);
+        ctx.moveTo(molduraX, molduraY - 2);
+        ctx.lineTo(molduraX, molduraY + markLength);
+        ctx.stroke();
+        // Canto superior direito
+        ctx.beginPath();
+        ctx.moveTo(molduraX + molduraW + 2, molduraY);
+        ctx.lineTo(molduraX + molduraW - markLength, molduraY);
+        ctx.moveTo(molduraX + molduraW, molduraY - 2);
+        ctx.lineTo(molduraX + molduraW, molduraY + markLength);
+        ctx.stroke();
+        // Canto inferior esquerdo
+        ctx.beginPath();
+        ctx.moveTo(molduraX - 2, molduraY + molduraH);
+        ctx.lineTo(molduraX + markLength, molduraY + molduraH);
+        ctx.moveTo(molduraX, molduraY + molduraH + 2);
+        ctx.lineTo(molduraX, molduraY + molduraH - markLength);
+        ctx.stroke();
+        // Canto inferior direito
+        ctx.beginPath();
+        ctx.moveTo(molduraX + molduraW + 2, molduraY + molduraH);
+        ctx.lineTo(molduraX + molduraW - markLength, molduraY + molduraH);
+        ctx.moveTo(molduraX + molduraW, molduraY + molduraH + 2);
+        ctx.lineTo(molduraX + molduraW, molduraY + molduraH - markLength);
+        ctx.stroke();
+        ctx.restore();
     }
     
     // ----------------------- SINGLE TAB (foto única) ----------------------------
@@ -516,7 +534,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         const w_px = Math.round(CM_TO_PX(sp.totalCM.w));
         const h_px = Math.round(CM_TO_PX(sp.totalCM.h));
         singleCanvas.width = w_px; singleCanvas.height = h_px;
-        drawPolaroidWithCaption(singleCtx, off, currentSingleType, 0, 0, w_px, h_px, ""); // sem legenda no single
+        drawPolaroidWithCaption(singleCtx, off, currentSingleType, 0, 0, w_px, h_px, "");
     }
     
     function applyImageFilters(imageData, brightness, contrast, sharpenAmount) {
@@ -561,7 +579,7 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         return imageData;
     }
     
-    // Single eventos
+    // Eventos Single
     document.getElementById('uploadZoneSingle').addEventListener('click', () => document.getElementById('singleFileInput').click());
     document.getElementById('singleFileInput').addEventListener('change', (e) => {
         if (e.target.files[0]) {
@@ -602,8 +620,8 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
     });
     resizeSingleCanvas();
     
-    // ----------------------- MULTI TAB (A4 com grid 3x3, espaçamento 4mm, legenda) -----------------------------
-    let loadedImages = []; // array de {name, imgElement}
+    // ----------------------- MULTI TAB (A4 com grid 3x3) -----------------------------
+    let loadedImages = [];
     const multiDrop = document.getElementById('multiDropzone');
     const multiFile = document.getElementById('multiFileInput');
     const photosContainer = document.getElementById('photosContainer');
@@ -631,16 +649,16 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
     }
     
     function addImagesFromFiles(files) {
-        let newItems = [];
-        const totalAfter = loadedImages.length + files.length;
+        let filesArray = Array.from(files);
+        const totalAfter = loadedImages.length + filesArray.length;
         if (totalAfter > 9) {
-            alert("⚠️ Máximo de 9 fotos para montagem 3x3. Apenas as primeiras serão adicionadas.");
-            files = Array.from(files).slice(0, 9 - loadedImages.length);
+            alert("⚠️ Máximo de 9 fotos para montagem 3x3. As primeiras serão adicionadas.");
+            filesArray = filesArray.slice(0, 9 - loadedImages.length);
         }
-        let pending = 0;
-        files.forEach(file => {
-            if(!file.type.startsWith('image/')) return;
-            pending++;
+        let pending = filesArray.length;
+        if (pending === 0) return;
+        filesArray.forEach(file => {
+            if(!file.type.startsWith('image/')) { pending--; return; }
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
@@ -652,7 +670,6 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
             };
             reader.readAsDataURL(file);
         });
-        if(pending===0 && files.length===0) updateThumbnails();
     }
     
     multiDrop.addEventListener('click', () => multiFile.click());
@@ -665,62 +682,79 @@ Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 f
         if(e.dataTransfer.files) addImagesFromFiles(e.dataTransfer.files);
     });
     
-    // Layout fixo 3x3, espaçamento 4mm, margem configurável
     generateBtn.addEventListener('click', () => {
-        let images = [...loadedImages];
-        if (images.length === 0) { alert("Adicione pelo menos uma foto."); return; }
-        if (images.length > 9) images = images.slice(0,9);
+        if (loadedImages.length === 0) { alert("Adicione pelo menos uma foto."); return; }
         const polaType = document.getElementById('multiPolaroidType').value;
         let marginMM = parseFloat(document.getElementById('marginMM').value);
-        const spacingMM = 4.0; // fixo 4mm conforme solicitado
+        const spacingMM = 4; // espaçamento fixo 4mm
         const globalCaption = document.getElementById('globalCaption').value;
         
         const marginPx = marginMM * (DPI / 25.4);
         const spacingPx = spacingMM * (DPI / 25.4);
-        
-        const cols = 3;
-        const rows = 3;
+        const cols = 3, rows = 3;
         const availableWidth = A4_PX.w - 2 * marginPx;
         const availableHeight = A4_PX.h - 2 * marginPx;
         const cellWidth = (availableWidth - (cols-1)*spacingPx) / cols;
-        
-        // Calcular altura da moldura preservando proporção do tipo Polaroid
         const spec = POLA_SPECS[polaType];
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
         let cellHeight = cellWidth / polaroidAspect;
-        // Verificar se cabe em altura
         let totalHeightNeeded = rows * cellHeight + (rows-1)*spacingPx;
         if (totalHeightNeeded > availableHeight) {
-            // recalcula baseado na altura
             cellHeight = (availableHeight - (rows-1)*spacingPx) / rows;
-            cellWidth = cellHeight * polaroidAspect;
+            // não reajustamos cellWidth para manter proporção? Para preservar a área da frase, mantemos a largura original da célula baseada na altura
+            // melhor manter a consistência: usar a altura recalculada e derivar largura
+            // Mas a largura da célula original foi calculada com base na largura disponível, se ajustarmos agora, pode desalinhar.
+            // Para manter grid perfeito, vamos recalcular cellWidth a partir da nova cellHeight
+            const newCellWidth = cellHeight * polaroidAspect;
+            if (newCellWidth <= (availableWidth - (cols-1)*spacingPx)/cols) {
+                // usamos nova largura, mas redistribui os espaços laterais? Simples: mantemos a célula com largura ajustada e centralizamos.
+                // Para não complicar, vamos manter o cálculo baseado na altura, e recalcular a posição X com margem extra para centralizar.
+                // Implementação mais robusta: recalcular o layout com base na altura.
+                const totalWidthNeeded = cols * newCellWidth + (cols-1)*spacingPx;
+                const offsetLeft = marginPx + (availableWidth - totalWidthNeeded) / 2;
+                // Vamos desenhar célula por célula com novo tamanho.
+                a4Ctx.fillStyle = "#FFFFFF";
+                a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
+                let idx = 0;
+                for (let row = 0; row < rows; row++) {
+                    for (let col = 0; col < cols; col++) {
+                        if (idx >= loadedImages.length) break;
+                        const x = offsetLeft + col * (newCellWidth + spacingPx);
+                        const y = marginPx + row * (cellHeight + spacingPx);
+                        const imgObj = loadedImages[idx].imgElement;
+                        const coords = drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, newCellWidth, cellHeight, globalCaption);
+                        if (coords) drawCropMarks(a4Ctx, coords.molduraX, coords.molduraY, coords.molduraW, coords.molduraH);
+                        idx++;
+                    }
+                    if (idx >= loadedImages.length) break;
+                }
+                alert(`Montagem concluída com ${loadedImages.length} foto(s). Marcas de corte adicionadas.`);
+                return;
+            }
         }
-        
-        // Limpar canvas A4
+        // Layout padrão com base na largura
         a4Ctx.fillStyle = "#FFFFFF";
         a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
-        
         let idx = 0;
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                if (idx >= images.length) break;
+                if (idx >= loadedImages.length) break;
                 const x = marginPx + col * (cellWidth + spacingPx);
                 const y = marginPx + row * (cellHeight + spacingPx);
-                const imgObj = images[idx].imgElement;
-                // legenda: se globalCaption tiver conteúdo, usa; senão, frase vazia
-                let caption = globalCaption.trim() === "" ? "" : globalCaption;
-                drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, cellWidth, cellHeight, caption);
+                const imgObj = loadedImages[idx].imgElement;
+                const coords = drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, cellWidth, cellHeight, globalCaption);
+                if (coords) drawCropMarks(a4Ctx, coords.molduraX, coords.molduraY, coords.molduraW, coords.molduraH);
                 idx++;
             }
-            if (idx >= images.length) break;
+            if (idx >= loadedImages.length) break;
         }
-        alert(`Montagem concluída: ${images.length} foto(s) posicionada(s) em grid 3x3.`);
+        alert(`Montagem concluída com ${loadedImages.length} foto(s). Espaçamento vertical/horizontal respeitado.`);
     });
     
     downloadA4.addEventListener('click', () => {
         if(loadedImages.length === 0) { alert("Nenhuma foto carregada para montagem."); return; }
         const link = document.createElement('a');
-        link.download = `a4_polaroid_3x3_${Date.now()}.png`;
+        link.download = `a4_polaroid_recortes_${Date.now()}.png`;
         link.href = a4Canvas.toDataURL('image/png');
         link.click();
     });
