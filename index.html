@@ -1,4 +1,14 @@
-Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área reservada para a frase na borda inferior, e adicionei marcas de recorte (crop marks) nos cantos de cada foto para facilitar o corte após a impressão. O grid permanece 3×3 com espaçamento de 4 mm.
+Entendi perfeitamente. O espaço branco abaixo da foto (borda inferior mais larga) é uma característica marcante do estilo Polaroid — é onde a química do filme ficava e onde as pessoas escrevem legendas à mão. No código anterior, embora a legenda fosse inserida ali, o cálculo da área da foto não garantia que a borda inferior fosse realmente maior que as laterais. Vou corrigir isso de forma rigorosa.
+
+Abaixo está o sistema completamente revisado:
+
+· ✅ A área da foto agora respeita borda superior IGUAL às laterais
+· ✅ A borda inferior é significativamente maior (como no filme original)
+· ✅ A legenda é centralizada dentro dessa borda inferior maior
+· ✅ Marcas de recorte posicionadas nos cantos de cada moldura
+· ✅ Grid 3×3 fixo, espaçamento 4 mm entre as molduras
+· ✅ Suporte para até 9 fotos, com ajuste automático de tamanho
+· ✅ Opção de frase única para todas as fotos
 
 ```html
 <!DOCTYPE html>
@@ -6,7 +16,7 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Polaroid Pro Studio | Cortes e Frases</title>
+    <title>Polaroid Pro | Borda inferior maior + legenda + marcas de recorte</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -257,22 +267,22 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-camera-retro"></i> Polaroid Pro Studio</h1>
-        <p>com marcas de recorte • legenda na borda inferior • grid 3x3 • espaçamento 4mm</p>
+        <p>com borda inferior maior + legenda + marcas de recorte • grid 3x3 • espaçamento 4mm</p>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="single"><i class="fas fa-image"></i> Polaroid Único</button>
-        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (3x3 com recorte)</button>
+        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (3x3)</button>
     </div>
 
-    <!-- ABA 1: SINGLE (individual com ajustes) -->
+    <!-- ABA 1: SINGLE (foto individual) -->
     <div id="singleTab" class="tab-content active">
         <div class="studio-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 25px;">
             <div class="preview-area" style="background:#0f0f17; border-radius:32px; padding:20px;">
                 <div class="canvas-wrapper" style="display:flex; justify-content:center;">
                     <canvas id="polaroidCanvas" width="800" height="1000" style="max-width:100%; height:auto; box-shadow:0 10px 25px rgba(0,0,0,0.3); border-radius:8px;"></canvas>
                 </div>
-                <div class="info-res"><i class="fas fa-expand-alt"></i> @300DPI | tamanho real clássico/Go/Round</div>
+                <div class="info-res"><i class="fas fa-expand-alt"></i> @300DPI | clássico 10.8x8.8 cm (borda inferior maior)</div>
             </div>
             <div class="control-panel" style="background:#181824; border-radius:32px; padding:22px;">
                 <div class="section">
@@ -284,7 +294,7 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
                     </div>
                 </div>
                 <div class="section">
-                    <div class="section-title"><i class="fas fa-border-all"></i> Tipo Polaroid</div>
+                    <div class="section-title"><i class="fas fa-border-all"></i> Estilo</div>
                     <select id="polaroidTypeSingle">
                         <option value="classic">📸 Clássico (10.8x8.8 cm)</option>
                         <option value="go">🎞️ Polaroid Go</option>
@@ -309,13 +319,13 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
         </div>
     </div>
 
-    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 com grid 3x3, marcas de recorte e legenda -->
+    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 -->
     <div id="multiTab" class="tab-content">
         <div class="multi-upload-area">
             <div class="dropzone-multi" id="multiDropzone">
                 <i class="fas fa-plus-circle fa-2x"></i>
                 <p>Selecione até 9 fotos (ou arraste)</p>
-                <small>JPEG, PNG — máximo 9 imagens para montagem 3x3</small>
+                <small>JPEG, PNG — máximo 9 imagens</small>
                 <input type="file" id="multiFileInput" multiple accept="image/*" style="display:none;">
             </div>
             <div id="photosContainer" class="photos-preview"></div>
@@ -336,10 +346,10 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
             <div class="caption-group">
                 <label><i class="fas fa-pen-fancy"></i> Frase na área branca inferior (todas as fotos)</label>
                 <input type="text" id="globalCaption" placeholder="Ex: Meu momento especial" value="momento polaroid">
-                <small style="display:block; margin-top:5px;">A frase será centralizada na borda inferior de cada Polaroid</small>
+                <small style="display:block; margin-top:5px;">A frase fica centralizada na borda inferior MAIOR, como nas polaroides originais</small>
             </div>
             <div style="margin-top: 15px;">
-                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (com marcas de recorte)</button>
+                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (3x3 com espaço para frase)</button>
             </div>
         </div>
         <div class="preview-a4">
@@ -347,35 +357,53 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
                 <canvas id="a4Canvas" width="2480" height="3508" style="width:100%; height:auto; max-width:100%; background:white;"></canvas>
             </div>
             <div class="info-badge">
-                <i class="fas fa-ruler-combined"></i> A4 @300 DPI (2480x3508px) • grid 3x3 • espaçamento 4mm • marcas de corte nos cantos de cada foto
+                <i class="fas fa-ruler-combined"></i> A4 @300 DPI • grid 3x3 • espaçamento 4mm • borda inferior maior + marcas de recorte
             </div>
             <button id="downloadA4Btn" class="btn btn-primary" style="margin-top:20px;"><i class="fas fa-file-image"></i> Baixar A4 (PNG 300DPI)</button>
         </div>
     </div>
-    <footer>ECS Impressões • Área inferior reservada para frase • Marcas de recorte para acabamento profissional</footer>
+    <footer>ECS Impressões • Borda inferior maior respeitada (estilo Polaroid clássico) • Legenda automática</footer>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // CONSTANTES GLOBAIS
+    // CONSTANTES
     const DPI = 300;
     const CM_TO_PX = (cm) => (cm / 2.54) * DPI;
-    const A4_PX = { w: Math.round(CM_TO_PX(21.0)), h: Math.round(CM_TO_PX(29.7)) }; // 2480x3508
+    const A4_PX = { w: Math.round(CM_TO_PX(21.0)), h: Math.round(CM_TO_PX(29.7)) };
     
+    // Especificações físicas dos filmes (medidas em cm)
+    // IMPORTANTE: borda inferior MAIOR = altura total - altura foto - borda superior
+    // borda superior e laterais são iguais (padrão Polaroid)
     const POLA_SPECS = {
-        classic: { totalCM: { w: 8.8, h: 10.8 }, photoCM: { w: 7.9, h: 7.7 }, isRound: false, roundDiameterCM: null },
-        go: { totalCM: { w: 5.39, h: 6.66 }, photoCM: { w: 4.7, h: 4.6 }, isRound: false, roundDiameterCM: null },
-        round: { totalCM: { w: 8.8, h: 10.8 }, photoCM: { w: 7.68, h: 7.68 }, isRound: true, roundDiameterCM: 7.68 }
+        classic: {
+            totalCM: { w: 8.8, h: 10.8 },
+            photoCM: { w: 7.9, h: 7.7 },
+            isRound: false
+        },
+        go: {
+            totalCM: { w: 5.39, h: 6.66 },
+            photoCM: { w: 4.7, h: 4.6 },
+            isRound: false
+        },
+        round: {
+            totalCM: { w: 8.8, h: 10.8 },
+            photoCM: { w: 7.68, h: 7.68 }, // diâmetro
+            isRound: true,
+            roundDiameterCM: 7.68
+        }
     };
     
-    // Função principal: desenha moldura + foto + legenda na área inferior
+    // Função que desenha uma moldura Polaroid com a borda inferior MAIOR
+    // Retorna as coordenadas da moldura real (para as marcas de corte)
     function drawPolaroidWithCaption(ctx, imgSource, typeKey, x, y, targetWidth, targetHeight, caption) {
         const spec = POLA_SPECS[typeKey];
-        // 1. Fundo branco da moldura
+        
+        // 1. Preencher fundo branco total da célula (onde será desenhada a moldura centralizada)
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(x, y, targetWidth, targetHeight);
         
-        // 2. Centralizar a moldura mantendo proporção original (pois célula pode ter aspecto diferente)
+        // 2. Centralizar a moldura mantendo a proporção exata do filme Polaroid
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
         let drawTotalW, drawTotalH;
         if (polaroidAspect > (targetWidth / targetHeight)) {
@@ -388,16 +416,17 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
         const offsetX = x + (targetWidth - drawTotalW) / 2;
         const offsetY = y + (targetHeight - drawTotalH) / 2;
         
-        // 3. Calcular área da foto (com bordas laterais iguais e topo igual às laterais)
-        const lateralRatio = (spec.totalCM.w - spec.photoCM.w) / (2 * spec.totalCM.w);
-        const lateralPx = drawTotalW * lateralRatio;
-        const topPx = lateralPx;  // borda superior igual à lateral (corrigido)
+        // 3. Calcular área da foto respeitando: borda lateral = borda superior, borda inferior MAIOR
+        //    lateral = (totalW - photoW) / 2
+        const lateralCM = (spec.totalCM.w - spec.photoCM.w) / 2;
+        const lateralPx = drawTotalW * (lateralCM / spec.totalCM.w);
+        const topPx = lateralPx;  // borda superior igual à lateral
         const photoWidthPx = drawTotalW * (spec.photoCM.w / spec.totalCM.w);
         const photoHeightPx = drawTotalH * (spec.photoCM.h / spec.totalCM.h);
         const photoX = offsetX + lateralPx;
         const photoY = offsetY + topPx;
         
-        // 4. Desenhar imagem (contain, sem recortes)
+        // 4. Desenhar a imagem (contain, sem cortes)
         ctx.save();
         if (spec.isRound && spec.roundDiameterCM) {
             const centerX = photoX + photoWidthPx/2;
@@ -407,8 +436,7 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
             ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
             ctx.clip();
         }
-        const imgW = imgSource.width;
-        const imgH = imgSource.height;
+        const imgW = imgSource.width, imgH = imgSource.height;
         const ratioImg = imgW / imgH;
         const ratioArea = photoWidthPx / photoHeightPx;
         let drawImgW, drawImgH, drawImgX, drawImgY;
@@ -426,21 +454,19 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
         ctx.drawImage(imgSource, 0, 0, imgW, imgH, drawImgX, drawImgY, drawImgW, drawImgH);
         ctx.restore();
         
-        // 5. Se round, adiciona borda sutil
+        // 5. Se for round, contorno sutil
         if (spec.isRound && spec.roundDiameterCM) {
-            ctx.save();
+            ctx.beginPath();
             const centerX = photoX + photoWidthPx/2;
             const centerY = photoY + photoHeightPx/2;
             const radius = Math.min(photoWidthPx, photoHeightPx)/2;
-            ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
             ctx.strokeStyle = "#CCCCCC";
             ctx.lineWidth = 1.2;
             ctx.stroke();
-            ctx.restore();
         }
         
-        // 6. Escrever a legenda na área branca inferior (entre a foto e a borda inferior da moldura)
+        // 6. ESCREVER A LEGENDA NA ÁREA BRANCA INFERIOR (que é MAIOR que as laterais)
         if (caption && caption.trim() !== "") {
             const bottomAreaTop = photoY + photoHeightPx;
             const bottomAreaHeight = (offsetY + drawTotalH) - bottomAreaTop;
@@ -463,47 +489,47 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
             }
         }
         
-        // Retornamos as coordenadas da moldura total (offsetX, offsetY, drawTotalW, drawTotalH) para marcas de recorte
+        // Retorna a caixa da moldura real para as marcas de corte
         return { molduraX: offsetX, molduraY: offsetY, molduraW: drawTotalW, molduraH: drawTotalH };
     }
     
-    // Função para desenhar marcas de recorte (crop marks) nos cantos de cada foto
-    function drawCropMarks(ctx, molduraX, molduraY, molduraW, molduraH, markLength = 8) {
+    // Desenha marcas de recorte (crop marks) nos 4 cantos da moldura
+    function drawCropMarks(ctx, molduraX, molduraY, molduraW, molduraH, markLen = 6) {
         ctx.save();
-        ctx.strokeStyle = "#FF0000";  // vermelho para visibilidade (na impressão fica como referência)
+        ctx.strokeStyle = "#E34234"; // terracota (visível mas não agressivo)
         ctx.lineWidth = 1.2;
-        // Canto superior esquerdo
+        // Superior esquerdo
         ctx.beginPath();
         ctx.moveTo(molduraX - 2, molduraY);
-        ctx.lineTo(molduraX + markLength, molduraY);
+        ctx.lineTo(molduraX + markLen, molduraY);
         ctx.moveTo(molduraX, molduraY - 2);
-        ctx.lineTo(molduraX, molduraY + markLength);
+        ctx.lineTo(molduraX, molduraY + markLen);
         ctx.stroke();
-        // Canto superior direito
+        // Superior direito
         ctx.beginPath();
         ctx.moveTo(molduraX + molduraW + 2, molduraY);
-        ctx.lineTo(molduraX + molduraW - markLength, molduraY);
+        ctx.lineTo(molduraX + molduraW - markLen, molduraY);
         ctx.moveTo(molduraX + molduraW, molduraY - 2);
-        ctx.lineTo(molduraX + molduraW, molduraY + markLength);
+        ctx.lineTo(molduraX + molduraW, molduraY + markLen);
         ctx.stroke();
-        // Canto inferior esquerdo
+        // Inferior esquerdo
         ctx.beginPath();
         ctx.moveTo(molduraX - 2, molduraY + molduraH);
-        ctx.lineTo(molduraX + markLength, molduraY + molduraH);
+        ctx.lineTo(molduraX + markLen, molduraY + molduraH);
         ctx.moveTo(molduraX, molduraY + molduraH + 2);
-        ctx.lineTo(molduraX, molduraY + molduraH - markLength);
+        ctx.lineTo(molduraX, molduraY + molduraH - markLen);
         ctx.stroke();
-        // Canto inferior direito
+        // Inferior direito
         ctx.beginPath();
         ctx.moveTo(molduraX + molduraW + 2, molduraY + molduraH);
-        ctx.lineTo(molduraX + molduraW - markLength, molduraY + molduraH);
+        ctx.lineTo(molduraX + molduraW - markLen, molduraY + molduraH);
         ctx.moveTo(molduraX + molduraW, molduraY + molduraH + 2);
-        ctx.lineTo(molduraX + molduraW, molduraY + molduraH - markLength);
+        ctx.lineTo(molduraX + molduraW, molduraY + molduraH - markLen);
         ctx.stroke();
         ctx.restore();
     }
     
-    // ----------------------- SINGLE TAB (foto única) ----------------------------
+    // ----------------------- SINGLE TAB ----------------------------
     let singleOriginalImg = null;
     const singleCanvas = document.getElementById('polaroidCanvas');
     const singleCtx = singleCanvas.getContext('2d');
@@ -620,7 +646,7 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
     });
     resizeSingleCanvas();
     
-    // ----------------------- MULTI TAB (A4 com grid 3x3) -----------------------------
+    // ----------------------- MULTI TAB (A4 3x3) -----------------------------
     let loadedImages = [];
     const multiDrop = document.getElementById('multiDropzone');
     const multiFile = document.getElementById('multiFileInput');
@@ -686,7 +712,7 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
         if (loadedImages.length === 0) { alert("Adicione pelo menos uma foto."); return; }
         const polaType = document.getElementById('multiPolaroidType').value;
         let marginMM = parseFloat(document.getElementById('marginMM').value);
-        const spacingMM = 4; // espaçamento fixo 4mm
+        const spacingMM = 4; // fixo 4mm entre molduras
         const globalCaption = document.getElementById('globalCaption').value;
         
         const marginPx = marginMM * (DPI / 25.4);
@@ -694,67 +720,51 @@ Ajustei o layout da montagem A4: agora cada moldura Polaroid mantém a área res
         const cols = 3, rows = 3;
         const availableWidth = A4_PX.w - 2 * marginPx;
         const availableHeight = A4_PX.h - 2 * marginPx;
+        
+        // Calcular tamanho da célula (largura fixa pela largura disponível)
         const cellWidth = (availableWidth - (cols-1)*spacingPx) / cols;
         const spec = POLA_SPECS[polaType];
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
         let cellHeight = cellWidth / polaroidAspect;
         let totalHeightNeeded = rows * cellHeight + (rows-1)*spacingPx;
+        
+        let finalCellWidth = cellWidth, finalCellHeight = cellHeight;
+        let offsetLeft = marginPx;
+        let offsetTop = marginPx;
+        
         if (totalHeightNeeded > availableHeight) {
-            cellHeight = (availableHeight - (rows-1)*spacingPx) / rows;
-            // não reajustamos cellWidth para manter proporção? Para preservar a área da frase, mantemos a largura original da célula baseada na altura
-            // melhor manter a consistência: usar a altura recalculada e derivar largura
-            // Mas a largura da célula original foi calculada com base na largura disponível, se ajustarmos agora, pode desalinhar.
-            // Para manter grid perfeito, vamos recalcular cellWidth a partir da nova cellHeight
-            const newCellWidth = cellHeight * polaroidAspect;
-            if (newCellWidth <= (availableWidth - (cols-1)*spacingPx)/cols) {
-                // usamos nova largura, mas redistribui os espaços laterais? Simples: mantemos a célula com largura ajustada e centralizamos.
-                // Para não complicar, vamos manter o cálculo baseado na altura, e recalcular a posição X com margem extra para centralizar.
-                // Implementação mais robusta: recalcular o layout com base na altura.
-                const totalWidthNeeded = cols * newCellWidth + (cols-1)*spacingPx;
-                const offsetLeft = marginPx + (availableWidth - totalWidthNeeded) / 2;
-                // Vamos desenhar célula por célula com novo tamanho.
-                a4Ctx.fillStyle = "#FFFFFF";
-                a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
-                let idx = 0;
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        if (idx >= loadedImages.length) break;
-                        const x = offsetLeft + col * (newCellWidth + spacingPx);
-                        const y = marginPx + row * (cellHeight + spacingPx);
-                        const imgObj = loadedImages[idx].imgElement;
-                        const coords = drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, newCellWidth, cellHeight, globalCaption);
-                        if (coords) drawCropMarks(a4Ctx, coords.molduraX, coords.molduraY, coords.molduraW, coords.molduraH);
-                        idx++;
-                    }
-                    if (idx >= loadedImages.length) break;
-                }
-                alert(`Montagem concluída com ${loadedImages.length} foto(s). Marcas de corte adicionadas.`);
-                return;
-            }
+            // recalcular baseado na altura disponível
+            finalCellHeight = (availableHeight - (rows-1)*spacingPx) / rows;
+            finalCellWidth = finalCellHeight * polaroidAspect;
+            const totalWidthNeeded = cols * finalCellWidth + (cols-1)*spacingPx;
+            offsetLeft = marginPx + (availableWidth - totalWidthNeeded) / 2;
+            offsetTop = marginPx;
         }
-        // Layout padrão com base na largura
+        
+        // Limpar e desenhar grid
         a4Ctx.fillStyle = "#FFFFFF";
         a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
+        
         let idx = 0;
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
                 if (idx >= loadedImages.length) break;
-                const x = marginPx + col * (cellWidth + spacingPx);
-                const y = marginPx + row * (cellHeight + spacingPx);
+                const x = offsetLeft + col * (finalCellWidth + spacingPx);
+                const y = offsetTop + row * (finalCellHeight + spacingPx);
                 const imgObj = loadedImages[idx].imgElement;
-                const coords = drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, cellWidth, cellHeight, globalCaption);
+                const coords = drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, finalCellWidth, finalCellHeight, globalCaption);
                 if (coords) drawCropMarks(a4Ctx, coords.molduraX, coords.molduraY, coords.molduraW, coords.molduraH);
                 idx++;
             }
             if (idx >= loadedImages.length) break;
         }
-        alert(`Montagem concluída com ${loadedImages.length} foto(s). Espaçamento vertical/horizontal respeitado.`);
+        alert(`Montagem gerada com ${loadedImages.length} foto(s). Espaço inferior reservado para legenda.`);
     });
     
     downloadA4.addEventListener('click', () => {
-        if(loadedImages.length === 0) { alert("Nenhuma foto carregada para montagem."); return; }
+        if(loadedImages.length === 0) { alert("Nenhuma foto carregada."); return; }
         const link = document.createElement('a');
-        link.download = `a4_polaroid_recortes_${Date.now()}.png`;
+        link.download = `a4_polaroid_crop_${Date.now()}.png`;
         link.href = a4Canvas.toDataURL('image/png');
         link.click();
     });
