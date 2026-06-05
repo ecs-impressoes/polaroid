@@ -1,4 +1,4 @@
-Abaixo está o sistema profissional completo, agora com suporte a múltiplas fotos e montagem automática em folha A4 (300 DPI). O layout se ajusta dinamicamente ao número de imagens, mantendo a proporção exata de cada moldura Polaroid (clássica, Go ou Redonda) sem recortes ou distorções.
+Aqui está o sistema completo com as correções solicitadas: grid fixo de 3x3 fotos por folha A4, espaçamento de 4 mm entre molduras, borda superior igual às laterais, e campo para escrever uma legenda na área branca inferior de cada Polaroid.
 
 ```html
 <!DOCTYPE html>
@@ -6,7 +6,7 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Polaroid Pro Studio | Múltiplas Fotos em A4</title>
+    <title>Polaroid Pro Studio | Montagem A4 3x3 com legenda</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -82,7 +82,7 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
             to { opacity: 1; transform: translateY(0);}
         }
 
-        /* Grid layout para múltiplas fotos */
+        /* Multi A4 area */
         .multi-upload-area {
             background: #181824;
             border-radius: 32px;
@@ -240,21 +240,43 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
             font-size: 0.7rem;
             color: #5a5a70;
         }
+        
+        .warning-limit {
+            color: #ffaa66;
+            font-size: 0.75rem;
+            margin-top: 8px;
+        }
+        
+        /* Estilo do campo legenda */
+        .caption-group {
+            margin-top: 15px;
+            background: #101018;
+            border-radius: 28px;
+            padding: 12px 18px;
+        }
+        .caption-group label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 8px;
+        }
+        .caption-group input {
+            margin-top: 0;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-camera-retro"></i> Polaroid Pro Studio</h1>
-        <p>alta resolução 300 DPI • sem recortes • moldura autêntica</p>
+        <p>alta resolução 300 DPI • moldura autêntica • legenda na borda inferior</p>
     </div>
 
     <div class="tabs">
         <button class="tab-btn active" data-tab="single"><i class="fas fa-image"></i> Polaroid Único</button>
-        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (Múltiplas fotos)</button>
+        <button class="tab-btn" data-tab="multi"><i class="fas fa-layer-group"></i> Montagem A4 (3x3 fotos)</button>
     </div>
 
-    <!-- ABA 1: SINGLE (original aprimorado) -->
+    <!-- ABA 1: SINGLE (mantido para fotos individuais) -->
     <div id="singleTab" class="tab-content active">
         <div class="studio-grid" style="display: grid; grid-template-columns: 1fr 380px; gap: 25px;">
             <div class="preview-area" style="background:#0f0f17; border-radius:32px; padding:20px;">
@@ -298,13 +320,13 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         </div>
     </div>
 
-    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 -->
+    <!-- ABA 2: MÚLTIPLAS FOTOS EM A4 com grid 3x3 e legenda -->
     <div id="multiTab" class="tab-content">
         <div class="multi-upload-area">
             <div class="dropzone-multi" id="multiDropzone">
                 <i class="fas fa-plus-circle fa-2x"></i>
-                <p>Selecione várias fotos (ou arraste)</p>
-                <small>JPEG, PNG — até 30 imagens</small>
+                <p>Selecione até 9 fotos (ou arraste)</p>
+                <small>JPEG, PNG — máximo 9 imagens para montagem 3x3</small>
                 <input type="file" id="multiFileInput" multiple accept="image/*" style="display:none;">
             </div>
             <div id="photosContainer" class="photos-preview"></div>
@@ -312,7 +334,7 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
                 <div class="config-item">
                     <label><i class="fas fa-border-all"></i> Estilo Polaroid</label>
                     <select id="multiPolaroidType">
-                        <option value="classic">Clássico (retrato 10.8x8.8cm)</option>
+                        <option value="classic">Clássico (borda inferior maior)</option>
                         <option value="go">Polaroid Go (miniatura)</option>
                         <option value="round">Round (círculo)</option>
                     </select>
@@ -320,14 +342,20 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
                 <div class="config-item">
                     <label><i class="fas fa-arrows-alt"></i> Margem A4 (mm)</label>
                     <input type="number" id="marginMM" value="12" step="1" min="5" max="30">
+                    <small>distância das bordas da folha</small>
                 </div>
                 <div class="config-item">
-                    <label><i class="fas fa-grip-horizontal"></i> Espaçamento (mm)</label>
-                    <input type="number" id="spacingMM" value="8" step="1" min="2" max="20">
+                    <label><i class="fas fa-comment"></i> Legenda (frase abaixo da foto)</label>
+                    <input type="text" id="captionText" placeholder="Ex: Dia especial ❤️" value="">
                 </div>
-                <div class="config-item">
-                    <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4</button>
-                </div>
+            </div>
+            <div class="caption-group">
+                <label><i class="fas fa-pen-fancy"></i> Personalize a legenda para cada foto? (se vazio, usa frase genérica)</label>
+                <input type="text" id="globalCaption" placeholder="Frase que aparecerá em todas as fotos (opcional)" value="momentos polaroid">
+                <small style="display:block; margin-top:5px;">A legenda será centralizada na área branca inferior da moldura</small>
+            </div>
+            <div style="margin-top: 15px;">
+                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (3x3 - espaçamento 4mm)</button>
             </div>
         </div>
         <div class="preview-a4">
@@ -335,12 +363,12 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
                 <canvas id="a4Canvas" width="2480" height="3508" style="width:100%; height:auto; max-width:100%; background:white;"></canvas>
             </div>
             <div class="info-badge">
-                <i class="fas fa-ruler-combined"></i> A4 @300 DPI (2480x3508px) • layout automático sem recortes
+                <i class="fas fa-ruler-combined"></i> A4 @300 DPI (2480x3508px) • layout fixo 3 colunas × 3 linhas • espaçamento 4mm entre molduras • legenda na parte inferior
             </div>
             <button id="downloadA4Btn" class="btn btn-primary" style="margin-top:20px;"><i class="fas fa-file-image"></i> Baixar A4 (PNG 300DPI)</button>
         </div>
     </div>
-    <footer>ECS Impressões • Sistema profissional para estúdio • sem distorções • montagem inteligente em folha A4</footer>
+    <footer>ECS Impressões • Sistema profissional • topo da foto com mesma borda lateral • legenda automática</footer>
 </div>
 
 <script>
@@ -358,73 +386,49 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         round: { totalCM: { w: 8.8, h: 10.8 }, photoCM: { w: 7.68, h: 7.68 }, isRound: true, roundDiameterCM: 7.68 }
     };
     
-    // Helper: obter pixel size a partir de cm
-    function getPolaroidPixels(typeKey, scale = 1.0) {
-        const sp = POLA_SPECS[typeKey];
-        const w_px = Math.round(CM_TO_PX(sp.totalCM.w) * scale);
-        const h_px = Math.round(CM_TO_PX(sp.totalCM.h) * scale);
-        const photoWPx = Math.round(CM_TO_PX(sp.photoCM.w) * scale);
-        const photoHPx = Math.round(CM_TO_PX(sp.photoCM.h) * scale);
-        const lateralCM = (sp.totalCM.w - sp.photoCM.w) / 2;
-        const lateralPx = Math.round(CM_TO_PX(lateralCM) * scale);
-        const topBasePx = lateralPx;
-        const photoY = topBasePx;
-        const photoX = lateralPx;
-        let circleDiameterPx = null;
-        if (sp.isRound && sp.roundDiameterCM) circleDiameterPx = Math.round(CM_TO_PX(sp.roundDiameterCM) * scale);
-        return { totalW: w_px, totalH: h_px, photoW: photoWPx, photoH: photoHPx, photoX, photoY, isRound: sp.isRound, circleDiameterPx };
-    }
-    
-    // Desenha uma única moldura Polaroid em um contexto, com a imagem fornecida (HTMLImageElement ou canvas)
-    function drawPolaroidOnContext(ctx, imgSource, typeKey, targetX, targetY, targetWidth, targetHeight) {
-        // targetWidth/Height = tamanho final da moldura total em pixels
+    // Helper: desenha uma moldura Polaroid completa com legenda (na borda inferior)
+    // ctx, imgSource, typeKey, x, y, width, height (retângulo alvo da moldura), caption (string)
+    function drawPolaroidWithCaption(ctx, imgSource, typeKey, x, y, targetWidth, targetHeight, caption) {
         const spec = POLA_SPECS[typeKey];
-        // Calcular offsets proporcionais
-        const totalW_target = targetWidth;
-        const totalH_target = targetHeight;
-        const ratioTarget = totalW_target / totalH_target;
-        const ratioOriginal = spec.totalCM.w / spec.totalCM.h;
-        let drawTotalW, drawTotalH;
-        if (ratioOriginal > ratioTarget) {
-            drawTotalW = totalW_target;
-            drawTotalH = totalW_target / ratioOriginal;
-        } else {
-            drawTotalH = totalH_target;
-            drawTotalW = totalH_target * ratioOriginal;
-        }
-        const offX = targetX + (totalW_target - drawTotalW) / 2;
-        const offY = targetY + (totalH_target - drawTotalH) / 2;
-        
-        // Agora dentro da moldura desenhada, calcular área da foto 
-        const lateralRatio = spec.totalCM.w === 0 ? 0 : (spec.totalCM.w - spec.photoCM.w) / (2 * spec.totalCM.w);
-        const topRatio = (spec.totalCM.h - spec.photoCM.h) / spec.totalCM.h; // borda superior + inferior? Na verdade inferior maior, mas usamos área foto centralizada com deslocamento maior embaixo: simulamos proporcional.
-        // Mas precisamos da posição Y da foto: baseado na altura total da moldura desenhada.
-        const photoHeightPx = (spec.photoCM.h / spec.totalCM.h) * drawTotalH;
-        const photoWidthPx = (spec.photoCM.w / spec.totalCM.w) * drawTotalW;
-        const lateralMarginPx = (drawTotalW - photoWidthPx) / 2;
-        // Borda inferior maior: a área da foto fica ligeiramente acima do centro, mantendo mesma proporção do original.
-        // Vamos usar margem superior igual à lateral, e resto inferior.
-        const topMarginPx = lateralMarginPx;
-        const bottomTotal = drawTotalH - photoHeightPx - topMarginPx;
-        const photoYPos = offY + topMarginPx;
-        const photoXPos = offX + lateralMarginPx;
-        
-        // desenhar fundo branco
+        // 1. Desenhar fundo branco da moldura
         ctx.fillStyle = "#FFFFFF";
-        ctx.fillRect(offX, offY, drawTotalW, drawTotalH);
+        ctx.fillRect(x, y, targetWidth, targetHeight);
         
-        // se round, clip círculo
+        // 2. Calcular a área interna da foto dentro da moldura (proporcional)
+        // A proporção da moldura é fixa (totalCM.w / totalCM.h). Como o retângulo alvo pode ter proporção diferente,
+        // centralizamos a moldura mantendo a proporção original.
+        const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
+        let drawTotalW, drawTotalH;
+        if (polaroidAspect > (targetWidth / targetHeight)) {
+            drawTotalW = targetWidth;
+            drawTotalH = targetWidth / polaroidAspect;
+        } else {
+            drawTotalH = targetHeight;
+            drawTotalW = targetHeight * polaroidAspect;
+        }
+        const offsetX = x + (targetWidth - drawTotalW) / 2;
+        const offsetY = y + (targetHeight - drawTotalH) / 2;
+        
+        // 3. Dentro da moldura centralizada, calcular posição da foto (com bordas laterais iguais e topo igual lateral)
+        const lateralCM = (spec.totalCM.w - spec.photoCM.w) / 2;
+        const lateralRatio = lateralCM / spec.totalCM.w;
+        const lateralPx = drawTotalW * lateralRatio;
+        const topPx = lateralPx;  // topo igual às laterais (conforme solicitado)
+        const photoWidthPx = drawTotalW * (spec.photoCM.w / spec.totalCM.w);
+        const photoHeightPx = drawTotalH * (spec.photoCM.h / spec.totalCM.h);
+        const photoX = offsetX + lateralPx;
+        const photoY = offsetY + topPx;
+        
+        // 4. Desenhar a imagem dentro da área da foto (contain, sem cortes)
         ctx.save();
         if (spec.isRound && spec.roundDiameterCM) {
-            const centerX = photoXPos + photoWidthPx/2;
-            const centerY = photoYPos + photoHeightPx/2;
+            const centerX = photoX + photoWidthPx/2;
+            const centerY = photoY + photoHeightPx/2;
             const radius = Math.min(photoWidthPx, photoHeightPx)/2;
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
             ctx.clip();
         }
-        
-        // Desenhar imagem "contain" dentro da área da foto (sem recortes)
         const imgW = imgSource.width;
         const imgH = imgSource.height;
         const ratioImg = imgW / imgH;
@@ -433,42 +437,66 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         if (ratioImg > ratioArea) {
             drawImgH = photoHeightPx;
             drawImgW = imgW * (photoHeightPx / imgH);
-            drawImgX = photoXPos + (photoWidthPx - drawImgW) / 2;
-            drawImgY = photoYPos;
+            drawImgX = photoX + (photoWidthPx - drawImgW) / 2;
+            drawImgY = photoY;
         } else {
             drawImgW = photoWidthPx;
             drawImgH = imgH * (photoWidthPx / imgW);
-            drawImgX = photoXPos;
-            drawImgY = photoYPos + (photoHeightPx - drawImgH) / 2;
+            drawImgX = photoX;
+            drawImgY = photoY + (photoHeightPx - drawImgH) / 2;
         }
         ctx.drawImage(imgSource, 0, 0, imgW, imgH, drawImgX, drawImgY, drawImgW, drawImgH);
         ctx.restore();
         
-        // borda sutil para round
+        // 5. Se round, borda sutil
         if (spec.isRound && spec.roundDiameterCM) {
             ctx.save();
-            const centerX = photoXPos + photoWidthPx/2;
-            const centerY = photoYPos + photoHeightPx/2;
+            const centerX = photoX + photoWidthPx/2;
+            const centerY = photoY + photoHeightPx/2;
             const radius = Math.min(photoWidthPx, photoHeightPx)/2;
             ctx.beginPath();
             ctx.arc(centerX, centerY, radius, 0, Math.PI*2);
             ctx.strokeStyle = "#DDDDDD";
-            ctx.lineWidth = 1.2;
+            ctx.lineWidth = 1.5;
             ctx.stroke();
             ctx.restore();
         }
+        
+        // 6. Desenhar legenda na área branca inferior (entre o fim da foto e a borda inferior da moldura)
+        if (caption && caption.trim() !== "") {
+            const bottomAreaY = photoY + photoHeightPx;
+            const bottomAreaHeight = (offsetY + drawTotalH) - bottomAreaY;
+            if (bottomAreaHeight > 10) {
+                ctx.font = `400 ${Math.max(10, Math.min(16, bottomAreaHeight * 0.25))}px 'Segoe UI', 'Inter'`;
+                ctx.fillStyle = "#2c2c2c";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const centerTextX = offsetX + drawTotalW/2;
+                const textY = bottomAreaY + bottomAreaHeight/2;
+                ctx.fillText(caption, centerTextX, textY);
+            } else {
+                // fallback pequeno
+                ctx.font = `10px 'Segoe UI'`;
+                ctx.fillStyle = "#333";
+                ctx.textAlign = "center";
+                ctx.fillText(caption, offsetX + drawTotalW/2, bottomAreaY + bottomAreaHeight/2);
+            }
+            ctx.textAlign = "left"; // reset
+        }
     }
     
-    // ----------------------- SINGLE TAB (individual) ----------------------------
+    // ----------------------- SINGLE TAB (foto única) ----------------------------
     let singleOriginalImg = null;
     const singleCanvas = document.getElementById('polaroidCanvas');
     const singleCtx = singleCanvas.getContext('2d');
     let currentSingleType = "classic";
     
     function resizeSingleCanvas() {
-        const pxData = getPolaroidPixels(currentSingleType, 1.0);
-        singleCanvas.width = pxData.totalW;
-        singleCanvas.height = pxData.totalH;
+        const sp = POLA_SPECS[currentSingleType];
+        const w_px = Math.round(CM_TO_PX(sp.totalCM.w));
+        const h_px = Math.round(CM_TO_PX(sp.totalCM.h));
+        singleCanvas.width = w_px;
+        singleCanvas.height = h_px;
     }
     
     function applyFiltersAndRenderSingle() {
@@ -476,7 +504,6 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         const bright = parseInt(document.getElementById('brightSingle').value);
         const contrast = parseInt(document.getElementById('contSingle').value);
         const sharpen = parseInt(document.getElementById('sharpSingle').value);
-        // processar imagem via canvas offscreen
         const off = document.createElement('canvas');
         off.width = singleOriginalImg.width;
         off.height = singleOriginalImg.height;
@@ -485,11 +512,11 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         let imgData = octx.getImageData(0, 0, off.width, off.height);
         imgData = applyImageFilters(imgData, bright, contrast, sharpen);
         octx.putImageData(imgData, 0, 0);
-        // desenhar moldura
-        const px = getPolaroidPixels(currentSingleType, 1.0);
-        singleCanvas.width = px.totalW;
-        singleCanvas.height = px.totalH;
-        drawPolaroidOnContext(singleCtx, off, currentSingleType, 0, 0, px.totalW, px.totalH);
+        const sp = POLA_SPECS[currentSingleType];
+        const w_px = Math.round(CM_TO_PX(sp.totalCM.w));
+        const h_px = Math.round(CM_TO_PX(sp.totalCM.h));
+        singleCanvas.width = w_px; singleCanvas.height = h_px;
+        drawPolaroidWithCaption(singleCtx, off, currentSingleType, 0, 0, w_px, h_px, ""); // sem legenda no single
     }
     
     function applyImageFilters(imageData, brightness, contrast, sharpenAmount) {
@@ -534,7 +561,7 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         return imageData;
     }
     
-    // single events
+    // Single eventos
     document.getElementById('uploadZoneSingle').addEventListener('click', () => document.getElementById('singleFileInput').click());
     document.getElementById('singleFileInput').addEventListener('change', (e) => {
         if (e.target.files[0]) {
@@ -575,7 +602,7 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
     });
     resizeSingleCanvas();
     
-    // ----------------------- MULTI TAB (A4 layout) -----------------------------
+    // ----------------------- MULTI TAB (A4 com grid 3x3, espaçamento 4mm, legenda) -----------------------------
     let loadedImages = []; // array de {name, imgElement}
     const multiDrop = document.getElementById('multiDropzone');
     const multiFile = document.getElementById('multiFileInput');
@@ -604,19 +631,28 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
     }
     
     function addImagesFromFiles(files) {
-        Array.from(files).forEach(file => {
+        let newItems = [];
+        const totalAfter = loadedImages.length + files.length;
+        if (totalAfter > 9) {
+            alert("⚠️ Máximo de 9 fotos para montagem 3x3. Apenas as primeiras serão adicionadas.");
+            files = Array.from(files).slice(0, 9 - loadedImages.length);
+        }
+        let pending = 0;
+        files.forEach(file => {
             if(!file.type.startsWith('image/')) return;
+            pending++;
             const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
                     loadedImages.push({ name: file.name, imgElement: img });
-                    updateThumbnails();
+                    if (--pending === 0) updateThumbnails();
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         });
+        if(pending===0 && files.length===0) updateThumbnails();
     }
     
     multiDrop.addEventListener('click', () => multiFile.click());
@@ -629,74 +665,62 @@ Abaixo está o sistema profissional completo, agora com suporte a múltiplas fot
         if(e.dataTransfer.files) addImagesFromFiles(e.dataTransfer.files);
     });
     
-    // Layout inteligente A4
+    // Layout fixo 3x3, espaçamento 4mm, margem configurável
     generateBtn.addEventListener('click', () => {
-        if(loadedImages.length === 0) { alert("Adicione pelo menos uma foto."); return; }
+        let images = [...loadedImages];
+        if (images.length === 0) { alert("Adicione pelo menos uma foto."); return; }
+        if (images.length > 9) images = images.slice(0,9);
         const polaType = document.getElementById('multiPolaroidType').value;
-        const marginMM = parseFloat(document.getElementById('marginMM').value);
-        const spacingMM = parseFloat(document.getElementById('spacingMM').value);
+        let marginMM = parseFloat(document.getElementById('marginMM').value);
+        const spacingMM = 4.0; // fixo 4mm conforme solicitado
+        const globalCaption = document.getElementById('globalCaption').value;
+        
         const marginPx = marginMM * (DPI / 25.4);
         const spacingPx = spacingMM * (DPI / 25.4);
-        const availableWidth = A4_PX.w - marginPx * 2;
-        const availableHeight = A4_PX.h - marginPx * 2;
         
-        // Obter proporção da moldura Polaroid
+        const cols = 3;
+        const rows = 3;
+        const availableWidth = A4_PX.w - 2 * marginPx;
+        const availableHeight = A4_PX.h - 2 * marginPx;
+        const cellWidth = (availableWidth - (cols-1)*spacingPx) / cols;
+        
+        // Calcular altura da moldura preservando proporção do tipo Polaroid
         const spec = POLA_SPECS[polaType];
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
-        // Encontrar melhor grid (nCols x nRows) baseado na raiz quadrada + otimização
-        let bestLayout = { cols: 1, rows: 1, itemW: 0, itemH: 0 };
-        const totalImgs = loadedImages.length;
-        for (let cols = 1; cols <= totalImgs; cols++) {
-            let rows = Math.ceil(totalImgs / cols);
-            let itemWidth = (availableWidth - (cols-1)*spacingPx) / cols;
-            let itemHeight = itemWidth / polaroidAspect;
-            let totalHeightNeeded = rows * itemHeight + (rows-1)*spacingPx;
-            if (totalHeightNeeded <= availableHeight) {
-                bestLayout = { cols, rows, itemW: itemWidth, itemH: itemHeight };
-                break;
-            }
-        }
-        if (bestLayout.itemW === 0) { // fallback: calcular por altura
-            let rows = 1;
-            let bestH = 0;
-            for (let r = 1; r <= totalImgs; r++) {
-                let cols = Math.ceil(totalImgs / r);
-                let itemHeight = (availableHeight - (r-1)*spacingPx) / r;
-                let itemWidth = itemHeight * polaroidAspect;
-                let totalWidth = cols * itemWidth + (cols-1)*spacingPx;
-                if (totalWidth <= availableWidth) {
-                    bestLayout = { cols, rows: r, itemW: itemWidth, itemH: itemHeight };
-                    break;
-                }
-            }
-        }
-        if (bestLayout.itemW === 0) { // último recurso: escala forçada
-            bestLayout.cols = Math.ceil(Math.sqrt(totalImgs));
-            bestLayout.rows = Math.ceil(totalImgs / bestLayout.cols);
-            bestLayout.itemW = (availableWidth - (bestLayout.cols-1)*spacingPx) / bestLayout.cols;
-            bestLayout.itemH = bestLayout.itemW / polaroidAspect;
+        let cellHeight = cellWidth / polaroidAspect;
+        // Verificar se cabe em altura
+        let totalHeightNeeded = rows * cellHeight + (rows-1)*spacingPx;
+        if (totalHeightNeeded > availableHeight) {
+            // recalcula baseado na altura
+            cellHeight = (availableHeight - (rows-1)*spacingPx) / rows;
+            cellWidth = cellHeight * polaroidAspect;
         }
         
-        // Renderizar no canvas A4
+        // Limpar canvas A4
         a4Ctx.fillStyle = "#FFFFFF";
         a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
+        
         let idx = 0;
-        for (let row = 0; row < bestLayout.rows && idx < totalImgs; row++) {
-            for (let col = 0; col < bestLayout.cols && idx < totalImgs; col++) {
-                const x = marginPx + col * (bestLayout.itemW + spacingPx);
-                const y = marginPx + row * (bestLayout.itemH + spacingPx);
-                const imgObj = loadedImages[idx].imgElement;
-                // desenhar moldura polaroid dentro do retângulo (x,y, bestLayout.itemW, bestLayout.itemH)
-                drawPolaroidOnContext(a4Ctx, imgObj, polaType, x, y, bestLayout.itemW, bestLayout.itemH);
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                if (idx >= images.length) break;
+                const x = marginPx + col * (cellWidth + spacingPx);
+                const y = marginPx + row * (cellHeight + spacingPx);
+                const imgObj = images[idx].imgElement;
+                // legenda: se globalCaption tiver conteúdo, usa; senão, frase vazia
+                let caption = globalCaption.trim() === "" ? "" : globalCaption;
+                drawPolaroidWithCaption(a4Ctx, imgObj, polaType, x, y, cellWidth, cellHeight, caption);
                 idx++;
             }
+            if (idx >= images.length) break;
         }
+        alert(`Montagem concluída: ${images.length} foto(s) posicionada(s) em grid 3x3.`);
     });
     
     downloadA4.addEventListener('click', () => {
         if(loadedImages.length === 0) { alert("Nenhuma foto carregada para montagem."); return; }
         const link = document.createElement('a');
-        link.download = `a4_polaroid_${Date.now()}.png`;
+        link.download = `a4_polaroid_3x3_${Date.now()}.png`;
         link.href = a4Canvas.toDataURL('image/png');
         link.click();
     });
