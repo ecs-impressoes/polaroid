@@ -1,10 +1,12 @@
+Ajustei o espaçamento horizontal (e vertical) entre as molduras Polaroid para 15 mm, conforme solicitado. O grid continua 3×3, com margens laterais e superiores ajustáveis, e todas as características originais preservadas: borda inferior maior, legenda centralizada, marcas de recorte e alta resolução.
 
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Polaroid Pro | Borda inferior maior + legenda + marcas de recorte</title>
+    <title>Polaroid Pro | Espaçamento 15mm + borda inferior + legenda</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -249,13 +251,18 @@
             display: block;
             margin-bottom: 8px;
         }
+        .warning-spacing {
+            color: #ffaa66;
+            font-size: 0.7rem;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
 <div class="container">
     <div class="header">
         <h1><i class="fas fa-camera-retro"></i> Polaroid Pro Studio</h1>
-        <p>com borda inferior maior + legenda + marcas de recorte • grid 3x3 • espaçamento 4mm</p>
+        <p>espaçamento entre fotos: 15 mm • borda inferior maior + legenda + marcas de recorte</p>
     </div>
 
     <div class="tabs">
@@ -330,6 +337,11 @@
                     <label><i class="fas fa-arrows-alt"></i> Margem A4 (mm)</label>
                     <input type="number" id="marginMM" value="12" step="1" min="5" max="30">
                 </div>
+                <div class="config-item">
+                    <label><i class="fas fa-arrows-alt-h"></i> Espaçamento (mm) horizontal/vertical</label>
+                    <input type="number" id="spacingMM" value="15" step="1" min="5" max="30">
+                    <div class="warning-spacing"><i class="fas fa-ruler"></i> Espaçamento entre fotos: 15 mm (fixo conforme solicitado)</div>
+                </div>
             </div>
             <div class="caption-group">
                 <label><i class="fas fa-pen-fancy"></i> Frase na área branca inferior (todas as fotos)</label>
@@ -337,7 +349,7 @@
                 <small style="display:block; margin-top:5px;">A frase fica centralizada na borda inferior MAIOR, como nas polaroides originais</small>
             </div>
             <div style="margin-top: 15px;">
-                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (3x3 com espaço para frase)</button>
+                <button id="generateA4Btn" class="btn btn-primary" style="width:100%;"><i class="fas fa-object-group"></i> Gerar Montagem A4 (espaçamento 15mm)</button>
             </div>
         </div>
         <div class="preview-a4">
@@ -345,12 +357,12 @@
                 <canvas id="a4Canvas" width="2480" height="3508" style="width:100%; height:auto; max-width:100%; background:white;"></canvas>
             </div>
             <div class="info-badge">
-                <i class="fas fa-ruler-combined"></i> A4 @300 DPI • grid 3x3 • espaçamento 4mm • borda inferior maior + marcas de recorte
+                <i class="fas fa-ruler-combined"></i> A4 @300 DPI • grid 3x3 • espaçamento 15mm entre molduras • borda inferior maior + marcas de recorte
             </div>
             <button id="downloadA4Btn" class="btn btn-primary" style="margin-top:20px;"><i class="fas fa-file-image"></i> Baixar A4 (PNG 300DPI)</button>
         </div>
     </div>
-    <footer>ECS Impressões • Borda inferior maior respeitada (estilo Polaroid clássico) • Legenda automática</footer>
+    <footer>ECS Impressões • Espaçamento horizontal e vertical: 15mm • Legenda na área inferior reservada</footer>
 </div>
 
 <script>
@@ -361,8 +373,7 @@
     const A4_PX = { w: Math.round(CM_TO_PX(21.0)), h: Math.round(CM_TO_PX(29.7)) };
     
     // Especificações físicas dos filmes (medidas em cm)
-    // IMPORTANTE: borda inferior MAIOR = altura total - altura foto - borda superior
-    // borda superior e laterais são iguais (padrão Polaroid)
+    // borda inferior MAIOR = altura total - altura foto - borda superior (borda superior = lateral)
     const POLA_SPECS = {
         classic: {
             totalCM: { w: 8.8, h: 10.8 },
@@ -376,22 +387,19 @@
         },
         round: {
             totalCM: { w: 8.8, h: 10.8 },
-            photoCM: { w: 7.68, h: 7.68 }, // diâmetro
+            photoCM: { w: 7.68, h: 7.68 },
             isRound: true,
             roundDiameterCM: 7.68
         }
     };
     
-    // Função que desenha uma moldura Polaroid com a borda inferior MAIOR
-    // Retorna as coordenadas da moldura real (para as marcas de corte)
+    // Função que desenha uma moldura Polaroid com borda inferior maior
     function drawPolaroidWithCaption(ctx, imgSource, typeKey, x, y, targetWidth, targetHeight, caption) {
         const spec = POLA_SPECS[typeKey];
         
-        // 1. Preencher fundo branco total da célula (onde será desenhada a moldura centralizada)
         ctx.fillStyle = "#FFFFFF";
         ctx.fillRect(x, y, targetWidth, targetHeight);
         
-        // 2. Centralizar a moldura mantendo a proporção exata do filme Polaroid
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
         let drawTotalW, drawTotalH;
         if (polaroidAspect > (targetWidth / targetHeight)) {
@@ -404,17 +412,14 @@
         const offsetX = x + (targetWidth - drawTotalW) / 2;
         const offsetY = y + (targetHeight - drawTotalH) / 2;
         
-        // 3. Calcular área da foto respeitando: borda lateral = borda superior, borda inferior MAIOR
-        //    lateral = (totalW - photoW) / 2
         const lateralCM = (spec.totalCM.w - spec.photoCM.w) / 2;
         const lateralPx = drawTotalW * (lateralCM / spec.totalCM.w);
-        const topPx = lateralPx;  // borda superior igual à lateral
+        const topPx = lateralPx;
         const photoWidthPx = drawTotalW * (spec.photoCM.w / spec.totalCM.w);
         const photoHeightPx = drawTotalH * (spec.photoCM.h / spec.totalCM.h);
         const photoX = offsetX + lateralPx;
         const photoY = offsetY + topPx;
         
-        // 4. Desenhar a imagem (contain, sem cortes)
         ctx.save();
         if (spec.isRound && spec.roundDiameterCM) {
             const centerX = photoX + photoWidthPx/2;
@@ -442,7 +447,6 @@
         ctx.drawImage(imgSource, 0, 0, imgW, imgH, drawImgX, drawImgY, drawImgW, drawImgH);
         ctx.restore();
         
-        // 5. Se for round, contorno sutil
         if (spec.isRound && spec.roundDiameterCM) {
             ctx.beginPath();
             const centerX = photoX + photoWidthPx/2;
@@ -454,7 +458,6 @@
             ctx.stroke();
         }
         
-        // 6. ESCREVER A LEGENDA NA ÁREA BRANCA INFERIOR (que é MAIOR que as laterais)
         if (caption && caption.trim() !== "") {
             const bottomAreaTop = photoY + photoHeightPx;
             const bottomAreaHeight = (offsetY + drawTotalH) - bottomAreaTop;
@@ -477,37 +480,35 @@
             }
         }
         
-        // Retorna a caixa da moldura real para as marcas de corte
         return { molduraX: offsetX, molduraY: offsetY, molduraW: drawTotalW, molduraH: drawTotalH };
     }
     
-    // Desenha marcas de recorte (crop marks) nos 4 cantos da moldura
     function drawCropMarks(ctx, molduraX, molduraY, molduraW, molduraH, markLen = 6) {
         ctx.save();
-        ctx.strokeStyle = "#E34234"; // terracota (visível mas não agressivo)
+        ctx.strokeStyle = "#E34234";
         ctx.lineWidth = 1.2;
-        // Superior esquerdo
+        // superior esquerdo
         ctx.beginPath();
         ctx.moveTo(molduraX - 2, molduraY);
         ctx.lineTo(molduraX + markLen, molduraY);
         ctx.moveTo(molduraX, molduraY - 2);
         ctx.lineTo(molduraX, molduraY + markLen);
         ctx.stroke();
-        // Superior direito
+        // superior direito
         ctx.beginPath();
         ctx.moveTo(molduraX + molduraW + 2, molduraY);
         ctx.lineTo(molduraX + molduraW - markLen, molduraY);
         ctx.moveTo(molduraX + molduraW, molduraY - 2);
         ctx.lineTo(molduraX + molduraW, molduraY + markLen);
         ctx.stroke();
-        // Inferior esquerdo
+        // inferior esquerdo
         ctx.beginPath();
         ctx.moveTo(molduraX - 2, molduraY + molduraH);
         ctx.lineTo(molduraX + markLen, molduraY + molduraH);
         ctx.moveTo(molduraX, molduraY + molduraH + 2);
         ctx.lineTo(molduraX, molduraY + molduraH - markLen);
         ctx.stroke();
-        // Inferior direito
+        // inferior direito
         ctx.beginPath();
         ctx.moveTo(molduraX + molduraW + 2, molduraY + molduraH);
         ctx.lineTo(molduraX + molduraW - markLen, molduraY + molduraH);
@@ -593,7 +594,6 @@
         return imageData;
     }
     
-    // Eventos Single
     document.getElementById('uploadZoneSingle').addEventListener('click', () => document.getElementById('singleFileInput').click());
     document.getElementById('singleFileInput').addEventListener('change', (e) => {
         if (e.target.files[0]) {
@@ -700,7 +700,8 @@
         if (loadedImages.length === 0) { alert("Adicione pelo menos uma foto."); return; }
         const polaType = document.getElementById('multiPolaroidType').value;
         let marginMM = parseFloat(document.getElementById('marginMM').value);
-        const spacingMM = 4; // fixo 4mm entre molduras
+        let spacingMM = parseFloat(document.getElementById('spacingMM').value);
+        if (isNaN(spacingMM)) spacingMM = 15;
         const globalCaption = document.getElementById('globalCaption').value;
         
         const marginPx = marginMM * (DPI / 25.4);
@@ -709,7 +710,6 @@
         const availableWidth = A4_PX.w - 2 * marginPx;
         const availableHeight = A4_PX.h - 2 * marginPx;
         
-        // Calcular tamanho da célula (largura fixa pela largura disponível)
         const cellWidth = (availableWidth - (cols-1)*spacingPx) / cols;
         const spec = POLA_SPECS[polaType];
         const polaroidAspect = spec.totalCM.w / spec.totalCM.h;
@@ -721,7 +721,6 @@
         let offsetTop = marginPx;
         
         if (totalHeightNeeded > availableHeight) {
-            // recalcular baseado na altura disponível
             finalCellHeight = (availableHeight - (rows-1)*spacingPx) / rows;
             finalCellWidth = finalCellHeight * polaroidAspect;
             const totalWidthNeeded = cols * finalCellWidth + (cols-1)*spacingPx;
@@ -729,7 +728,6 @@
             offsetTop = marginPx;
         }
         
-        // Limpar e desenhar grid
         a4Ctx.fillStyle = "#FFFFFF";
         a4Ctx.fillRect(0, 0, A4_PX.w, A4_PX.h);
         
@@ -746,18 +744,17 @@
             }
             if (idx >= loadedImages.length) break;
         }
-        alert(`Montagem gerada com ${loadedImages.length} foto(s). Espaço inferior reservado para legenda.`);
+        alert(`Montagem gerada com ${loadedImages.length} foto(s). Espaçamento entre fotos: ${spacingMM}mm (horizontal e vertical).`);
     });
     
     downloadA4.addEventListener('click', () => {
         if(loadedImages.length === 0) { alert("Nenhuma foto carregada."); return; }
         const link = document.createElement('a');
-        link.download = `a4_polaroid_crop_${Date.now()}.png`;
+        link.download = `a4_polaroid_15mm_${Date.now()}.png`;
         link.href = a4Canvas.toDataURL('image/png');
         link.click();
     });
     
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
